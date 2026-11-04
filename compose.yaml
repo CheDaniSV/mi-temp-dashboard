@@ -1,0 +1,27 @@
+name: mi-temp
+services:
+  app:
+    image: ${MI_IMAGE:-mi-temp:local}
+    build: .
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 25s
+    ports:
+      - "${MI_BIND_IP:-192.168.1.102}:${MI_PORT:-8088}:8000"
+    environment:
+      MI_MAC: ${MI_MAC:-A4:C1:38:CC:2D:CB}
+      DBUS_SYSTEM_BUS_ADDRESS: unix:path=/run/dbus/system_bus_socket
+    volumes:
+      - history:/app/data
+      - /run/dbus:/run/dbus:ro
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  history:
+    name: mi-temp-history
